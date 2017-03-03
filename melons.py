@@ -1,21 +1,25 @@
+from random import randint
+
 """This file should have our order classes in it."""
 
 class AbstractMelonOrder(object):
+    shipped = False
+    # base_price = 5
 
-    def __init__(self, species, qty, order_type, tax):
+    def __init__(self, species, qty):
         """Runs as instantiation,tax is a decimal"""
 
-        self.order_type = order_type
         self.species = species
         self.qty = qty
-        self.shipped = False
-        self.tax = tax
+
+    def get_base_price(self):
+        return randint(5, 9)
 
     def get_total(self):
         """Calculate price."""
-        base_price = 5
-        base_price = base_price if self.species.lower() != "christmas melon" else base_price * 1.5
-        total = (1 + self.tax) * self.qty * base_price
+        self.base_price = self.get_base_price()
+        self.base_price = self.base_price if self.species.lower() != "christmas melon" else self.base_price * 1.5
+        total = (1 + self.tax) * self.qty * self.base_price
         return total
 
     def mark_shipped(self):
@@ -27,18 +31,21 @@ class AbstractMelonOrder(object):
 class DomesticMelonOrder(AbstractMelonOrder):
     """A domestic (in the US) melon order."""
 
+    order_type = "domestic"
+    tax = 0.08
+
 
     def __init__(self, species, qty):
-        super(DomesticMelonOrder, self).__init__(species, qty,"domestic", 
-                                                 0.08)
+        super(DomesticMelonOrder, self).__init__(species, qty)
 
 
 class InternationalMelonOrder(AbstractMelonOrder):
     """An international (non-US) melon order."""
+    tax = 0.17
+    order_type = "international"
 
     def __init__(self, species, qty, country_code):
-        super(InternationalMelonOrder, self).__init__(species, qty, "international", 
-                                                      0.17)
+        super(InternationalMelonOrder, self).__init__(species, qty)
 
         self.country_code = country_code
 
@@ -50,3 +57,9 @@ class InternationalMelonOrder(AbstractMelonOrder):
         return total
 
 
+class GovermentMelonOrder(AbstractMelonOrder):
+    passed_inspection = False
+    tax = 0
+
+    def mark_inspection(self, passed):
+        self.passed_inspection = passed
